@@ -5,6 +5,7 @@
 
 iPhone'daki fotoğraf ve videoları bilgisayara **hızlı** aktaran araç. Harita gezgini, cihaz bilgisi, yedekleme (kişiler, iMessage, WhatsApp) ve geri yükleme de içerir. Windows, macOS ve Linux'ta çalışır.
 Arayüz tarayıcıda açılır; Edge/Chrome yüklüyse adres çubuğu olmayan ayrı bir uygulama penceresi olarak gelir.
+**Arayüz dilleri:** Türkçe, English, 中文. Sağ üstten değiştirilebilir, ilk açılışta sistem dilinde başlar.
 
 ![iSync galeri ve kopyalama](docs/screenshots/gallery.png)
 
@@ -56,6 +57,7 @@ Ayrıntılar:
 - Sessiz kurulum: `iSync-Setup-1.0.0.exe --silent [--dir YOL] [--no-desktop] [--no-launch] [--driver]`
 - iSync zaten açıksa tekrar çalıştırmak ikinci bir kopya başlatmaz, açık olan pencereyi gösterir.
 - Pencere kapatıldığında, süren bir kopyalama veya yedek yoksa arka plandaki sunucu birkaç dakika içinde kendiliğinden kapanır.
+- Kurulum programı, uygulama ve kaldırma penceresi Windows diline göre Türkçe, İngilizce ya da Çince açılır.
 
 ### Bağlantı yardımcısı
 Telefon bağlı değilse (ilk açılışta, "Yenile"de ya da telefon çıkarılınca) iSync şu adımları sırayla otomatik denetler:
@@ -88,7 +90,12 @@ powershell -ExecutionPolicy Bypass -File packaging\build.ps1
 
 Komut satırı seçenekleri: `python -m isync --port 8765 --no-browser --host 0.0.0.0 --auto-exit`
 
-README ekran görüntülerini yenilemek için (sahte verilerle çalışan demo sunucusu, Edge veya Chrome gerekir):
+**Çeviriler:** Arayüz metinlerinin kaynağı Türkçedir. Çeviriler `isync/static/i18n/en.json` ve `zh.json` dosyalarındadır; anahtar, arayüzdeki Türkçe metnin kendisidir. `{}` değişken kısımları gösterir. Yeni metin ekledikten sonra eksik çevirileri görmek için:
+```powershell
+.venv\Scripts\python tools\i18n_extract.py
+```
+
+README ekran görüntülerini (üç dilde) yenilemek için (sahte verilerle çalışan demo sunucusu, Edge veya Chrome gerekir):
 ```powershell
 .venv\Scripts\python docs\demo\take_screenshots.py
 ```

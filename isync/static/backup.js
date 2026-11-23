@@ -4,9 +4,9 @@
 const B = { pane: "status", summary: null, contacts: null, chats: {}, src: "sms", chat: null, msgs: [], calls: null, safari: null, poll: null };
 const fileUrl2 = (a, extra = {}) => `/api/backup/file?${q({ domain: a.domain, path: a.path, ...extra })}`;
 const initials = (s) => (s || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
-const fmtTime = (t) => (t ? new Date(t * 1000).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : "");
-const fmtDate = (t) => (t ? new Date(t * 1000).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "");
-const fmtDT = (t) => (t ? new Date(t * 1000).toLocaleString("tr-TR") : "");
+const fmtTime = (t) => (t ? new Date(t * 1000).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" }) : "");
+const fmtDate = (t) => (t ? new Date(t * 1000).toLocaleDateString(LOCALE, { day: "numeric", month: "long", year: "numeric" }) : "");
+const fmtDT = (t) => (t ? new Date(t * 1000).toLocaleString(LOCALE) : "");
 
 window.iSyncViews.backup = async (first) => {
   await refreshBackup(); // her girişte güncel durum
@@ -64,7 +64,7 @@ function showJobState(j) {
   if (running) {
     const pct = j.percent || 0;
     const eta = pct > 1 && j.status === "running" ? (el / pct) * (100 - pct) : null;
-    txt = `${restore ? "Geri yükleniyor" : "Yedekleniyor"}: %${pct.toFixed(1)}`;
+    txt = `${restore ? "Geri yükleniyor" : "Yedekleniyor"}: %${pct.toFixed(1)}`; // i18n: "Yedekleniyor: %{}" kalıbı
     if (!restore) txt += ` · ${n(j.received_files || 0)} dosya alındı`;
     txt += ` · ${fmtDur(el)} geçti${eta ? ` · tahmini ${fmtDur(eta)} kaldı` : ""}`;
     if (j.skipped_files) txt += ` · ${n(j.skipped_files)} fotoğraf kütüphanesi dosyası atlandı`;

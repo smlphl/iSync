@@ -26,6 +26,104 @@ UNINSTALL_KEY = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\iSync"
 CREATE_NO_WINDOW = 0x08000000
 
 
+# ---------------------------------------------------------------- dil (Windows arayüz diline göre)
+def _ui_lang() -> str:
+    try:
+        import ctypes
+
+        primary = ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0x3FF
+        return {0x1F: "tr", 0x04: "zh"}.get(primary, "en")
+    except Exception:
+        return "en"
+
+
+LANG = os.environ.get("ISYNC_LANG") or _ui_lang()
+_L = {
+    "en": {
+        "{} {} Kurulumu": "{} {} Setup",
+        "iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme": "iPhone photo transfer, map, backup and restore",
+        "Kurulum klasörü:": "Install folder:",
+        "Gözat…": "Browse…",
+        "Masaüstüne kısayol koy": "Create a desktop shortcut",
+        "Kurulumdan sonra iSync'i başlat": "Launch iSync after setup",
+        "iPhone bağlantı sürücüsü": "iPhone connection driver",
+        "Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)": "Also install the Apple driver automatically (recommended · Microsoft Store, free)",
+        "Microsoft Store'da aç": "Open in Microsoft Store",
+        "Tekrar denetle": "Check again",
+        "✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır.": "✓ Apple Mobile Device Service found. iPhone connection is ready.",
+        "APPLE_MISSING": "Apple's iPhone driver is not on this computer. iSync needs the free \"Apple Devices\" app to connect to the phone. If the option below is checked, setup installs it for you too (Store terms apply).",
+        "Kur": "Install",
+        "Kapat": "Close",
+        "Bitir": "Finish",
+        "Kuruldu: {}": "Installed: {}",
+        "Kurulum başarısız:\n{}": "Setup failed:\n{}",
+        "DRIVER_FAIL_TAIL": "\n\nThe Microsoft Store page will open; click 'Get' there. When iSync opens, the connection assistant will guide you step by step.",
+        "iSync kuruldu. Başlat menüsünden açabilirsiniz.": "iSync is installed. You can open it from the Start menu.",
+        "Apple sürücüsü zaten kurulu.": "The Apple driver is already installed.",
+        "Apple Devices Microsoft Store'dan indiriliyor ve kuruluyor… (birkaç dakika sürebilir)": "Downloading and installing Apple Devices from the Microsoft Store… (may take a few minutes)",
+        "Bu Windows'ta winget yok.": "winget isn't available on this Windows.",
+        "winget çalıştırılamadı: {}": "Couldn't run winget: {}",
+        "Apple sürücüsü kuruldu.": "Apple driver installed.",
+        "Otomatik kurulum tamamlanamadı (kod {}).": "Automatic install didn't complete (code {}).",
+        "Çalışan iSync kapatılıyor…": "Closing running iSync…",
+        "Eski sürüm kaldırılıyor…": "Removing old version…",
+        "Dosyalar kopyalanıyor… {}": "Copying files… {}",
+        "Kısayollar oluşturuluyor…": "Creating shortcuts…",
+        "Kaldırma kaydı yazılıyor…": "Registering uninstaller…",
+        "Kurulum tamamlandı.": "Setup complete.",
+        "iPhone fotoğraf ve yedek aracı": "iPhone photo and backup tool",
+        "Kısayol oluşturulamadı: {}": "Couldn't create shortcut: {}",
+    },
+    "zh": {
+        "{} {} Kurulumu": "{} {} 安装程序",
+        "iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme": "iPhone 照片传输、地图、备份与恢复",
+        "Kurulum klasörü:": "安装文件夹：",
+        "Gözat…": "浏览…",
+        "Masaüstüne kısayol koy": "创建桌面快捷方式",
+        "Kurulumdan sonra iSync'i başlat": "安装后启动 iSync",
+        "iPhone bağlantı sürücüsü": "iPhone 连接驱动",
+        "Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)": "同时自动安装 Apple 驱动（推荐 · Microsoft Store，免费）",
+        "Microsoft Store'da aç": "在 Microsoft Store 中打开",
+        "Tekrar denetle": "重新检查",
+        "✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır.": "✓ 已找到 Apple Mobile Device Service，iPhone 连接已就绪。",
+        "APPLE_MISSING": "这台电脑上没有 Apple 的 iPhone 驱动。iSync 需要免费的“Apple Devices”应用才能连接手机。如果勾选下面的选项，安装程序也会为你安装它（适用 Store 使用条款）。",
+        "Kur": "安装",
+        "Kapat": "关闭",
+        "Bitir": "完成",
+        "Kuruldu: {}": "已安装：{}",
+        "Kurulum başarısız:\n{}": "安装失败：\n{}",
+        "DRIVER_FAIL_TAIL": "\n\n将打开 Microsoft Store 页面，请在其中点击“获取”。iSync 打开后，连接助手会一步步指导你。",
+        "iSync kuruldu. Başlat menüsünden açabilirsiniz.": "iSync 已安装，可从开始菜单打开。",
+        "Apple sürücüsü zaten kurulu.": "Apple 驱动已安装。",
+        "Apple Devices Microsoft Store'dan indiriliyor ve kuruluyor… (birkaç dakika sürebilir)": "正在从 Microsoft Store 下载并安装 Apple Devices…（可能需要几分钟）",
+        "Bu Windows'ta winget yok.": "此 Windows 上没有 winget。",
+        "winget çalıştırılamadı: {}": "无法运行 winget：{}",
+        "Apple sürücüsü kuruldu.": "Apple 驱动已安装。",
+        "Otomatik kurulum tamamlanamadı (kod {}).": "自动安装未完成（代码 {}）。",
+        "Çalışan iSync kapatılıyor…": "正在关闭运行中的 iSync…",
+        "Eski sürüm kaldırılıyor…": "正在移除旧版本…",
+        "Dosyalar kopyalanıyor… {}": "正在复制文件… {}",
+        "Kısayollar oluşturuluyor…": "正在创建快捷方式…",
+        "Kaldırma kaydı yazılıyor…": "正在注册卸载程序…",
+        "Kurulum tamamlandı.": "安装完成。",
+        "iPhone fotoğraf ve yedek aracı": "iPhone 照片与备份工具",
+        "Kısayol oluşturulamadı: {}": "无法创建快捷方式：{}",
+    },
+}
+_TR = {
+    "APPLE_MISSING": "Bu bilgisayarda Apple'ın iPhone sürücüsü yok. iSync telefona bağlanabilmek için ücretsiz \"Apple Devices\" "
+                     "uygulamasına ihtiyaç duyar. Aşağıdaki seçenek işaretliyse kurulum onu da sizin için kurar "
+                     "(Store kullanım koşulları geçerlidir).",
+    "DRIVER_FAIL_TAIL": "\n\nMicrosoft Store sayfası açılacak; oradan 'Yükle'ye basın. "
+                        "iSync açıldığında bağlantı yardımcısı sizi adım adım yönlendirecek.",
+}
+
+
+def T(text: str, *args) -> str:
+    s = _L.get(LANG, {}).get(text) or _TR.get(text) or text
+    return s.format(*args) if args else s
+
+
 def resource(name: str) -> Path:
     base = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
     return base / name
@@ -68,11 +166,11 @@ def winget_path() -> str | None:
 def install_apple_driver(progress=lambda pct, msg: None) -> tuple[bool, str]:
     """Apple Devices'ı Microsoft Store'dan winget ile kurar. (başarılı mı, mesaj)"""
     if apple_service_installed():
-        return True, "Apple sürücüsü zaten kurulu."
+        return True, T("Apple sürücüsü zaten kurulu.")
     wg = winget_path()
     if not wg:
-        return False, "Bu Windows'ta winget yok."
-    progress(None, "Apple Devices Microsoft Store'dan indiriliyor ve kuruluyor… (birkaç dakika sürebilir)")
+        return False, T("Bu Windows'ta winget yok.")
+    progress(None, T("Apple Devices Microsoft Store'dan indiriliyor ve kuruluyor… (birkaç dakika sürebilir)"))
     try:
         r = subprocess.run([wg, "install", "--id", "9NP83LWLPZ9K", "--source", "msstore", "--exact",
                             "--accept-package-agreements", "--accept-source-agreements",
@@ -80,10 +178,10 @@ def install_apple_driver(progress=lambda pct, msg: None) -> tuple[bool, str]:
                            capture_output=True, text=True, encoding="utf-8", errors="replace",
                            timeout=1800, creationflags=CREATE_NO_WINDOW)
     except Exception as e:
-        return False, f"winget çalıştırılamadı: {e}"
+        return False, T("winget çalıştırılamadı: {}", e)
     if apple_service_installed():
-        return True, "Apple sürücüsü kuruldu."
-    return False, f"Otomatik kurulum tamamlanamadı (kod {r.returncode})."
+        return True, T("Apple sürücüsü kuruldu.")
+    return False, T("Otomatik kurulum tamamlanamadı (kod {}).", r.returncode)
 
 
 def stop_running(install_dir: Path) -> None:
@@ -105,7 +203,7 @@ def shortcut(path: Path, target: Path, workdir: Path, desc: str) -> None:
     r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps], env=env,
                        creationflags=CREATE_NO_WINDOW, capture_output=True, text=True)
     if r.returncode != 0:
-        raise RuntimeError(f"Kısayol oluşturulamadı: {r.stderr.strip()[:200]}")
+        raise RuntimeError(T("Kısayol oluşturulamadı: {}", r.stderr.strip()[:200]))
 
 
 def special_folder(name: str) -> Path:
@@ -136,11 +234,11 @@ def register_uninstall(install_dir: Path, version: str) -> None:
 
 def install(install_dir: Path, desktop: bool, progress=lambda pct, msg: None) -> Path:
     version = payload_version()
-    progress(2, "Çalışan iSync kapatılıyor…")
+    progress(2, T("Çalışan iSync kapatılıyor…"))
     stop_running(install_dir)
     install_dir.mkdir(parents=True, exist_ok=True)
     # Eski sürüm dosyalarını temizle (kullanıcı verileri burada değil, ~/.isync ve fotoğraf klasöründe)
-    progress(5, "Eski sürüm kaldırılıyor…")
+    progress(5, T("Eski sürüm kaldırılıyor…"))
     for sub in ("_internal",):
         p = install_dir / sub
         if p.exists():
@@ -158,15 +256,15 @@ def install(install_dir: Path, desktop: bool, progress=lambda pct, msg: None) ->
                 while chunk := src.read(1 << 20):
                     dst.write(chunk)
             done += m.file_size
-            progress(5 + 80 * done / total, f"Dosyalar kopyalanıyor… {m.filename[-60:]}")
-    progress(88, "Kısayollar oluşturuluyor…")
+            progress(5 + 80 * done / total, T("Dosyalar kopyalanıyor… {}", m.filename[-60:]))
+    progress(88, T("Kısayollar oluşturuluyor…"))
     exe = install_dir / EXE
-    shortcut(special_folder("Programs") / f"{APP}.lnk", exe, install_dir, "iPhone fotoğraf ve yedek aracı")
+    shortcut(special_folder("Programs") / f"{APP}.lnk", exe, install_dir, T("iPhone fotoğraf ve yedek aracı"))
     if desktop:
-        shortcut(special_folder("Desktop") / f"{APP}.lnk", exe, install_dir, "iPhone fotoğraf ve yedek aracı")
-    progress(95, "Kaldırma kaydı yazılıyor…")
+        shortcut(special_folder("Desktop") / f"{APP}.lnk", exe, install_dir, T("iPhone fotoğraf ve yedek aracı"))
+    progress(95, T("Kaldırma kaydı yazılıyor…"))
     register_uninstall(install_dir, version)
-    progress(100, "Kurulum tamamlandı.")
+    progress(100, T("Kurulum tamamlandı."))
     return exe
 
 
@@ -177,7 +275,7 @@ def gui(args) -> None:
 
     version = payload_version()
     root = tk.Tk()
-    root.title(f"{APP} {version} Kurulumu")
+    root.title(T("{} {} Kurulumu", APP, version))
     root.geometry("640x560")
     root.resizable(False, False)
     try:
@@ -204,9 +302,9 @@ def gui(args) -> None:
     t = ttk.Frame(head)
     t.pack(side="left", fill="x")
     ttk.Label(t, text=f"{APP} {version}", font=("Segoe UI", 18, "bold")).pack(anchor="w")
-    ttk.Label(t, text="iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme").pack(anchor="w")
+    ttk.Label(t, text=T("iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme")).pack(anchor="w")
 
-    ttk.Label(frm, text="Kurulum klasörü:").pack(anchor="w", pady=(18, 2))
+    ttk.Label(frm, text=T("Kurulum klasörü:")).pack(anchor="w", pady=(18, 2))
     row = ttk.Frame(frm)
     row.pack(fill="x")
     dir_var = tk.StringVar(value=str(Path(args.dir) if args.dir else default_dir()))
@@ -217,35 +315,33 @@ def gui(args) -> None:
         if p:
             dir_var.set(str(Path(p) / APP) if Path(p).name.lower() != APP.lower() else p)
 
-    ttk.Button(row, text="Gözat…", command=browse).pack(side="left", padx=(6, 0))
+    ttk.Button(row, text=T("Gözat…"), command=browse).pack(side="left", padx=(6, 0))
 
     desk = tk.BooleanVar(value=not args.no_desktop)
     launch = tk.BooleanVar(value=not args.no_launch)
-    ttk.Checkbutton(frm, text="Masaüstüne kısayol koy", variable=desk).pack(anchor="w", pady=(12, 0))
-    ttk.Checkbutton(frm, text="Kurulumdan sonra iSync'i başlat", variable=launch).pack(anchor="w")
+    ttk.Checkbutton(frm, text=T("Masaüstüne kısayol koy"), variable=desk).pack(anchor="w", pady=(12, 0))
+    ttk.Checkbutton(frm, text=T("Kurulumdan sonra iSync'i başlat"), variable=launch).pack(anchor="w")
 
     # Apple sürücüsü
-    box = ttk.LabelFrame(frm, text="iPhone bağlantı sürücüsü", padding=10)
+    box = ttk.LabelFrame(frm, text=T("iPhone bağlantı sürücüsü"), padding=10)
     box.pack(fill="x", pady=(14, 0))
     apple_lbl = ttk.Label(box, text="", wraplength=540, justify="left")
     apple_lbl.pack(anchor="w")
     drv = tk.BooleanVar(value=True)
-    drv_chk = ttk.Checkbutton(box, text="Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)",
+    drv_chk = ttk.Checkbutton(box, text=T("Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)"),
                               variable=drv)
     btns = ttk.Frame(box)
-    store_btn = ttk.Button(btns, text="Microsoft Store'da aç", command=lambda: os.startfile(STORE_URL))
-    recheck_btn = ttk.Button(btns, text="Tekrar denetle", command=lambda: refresh_apple())
+    store_btn = ttk.Button(btns, text=T("Microsoft Store'da aç"), command=lambda: os.startfile(STORE_URL))
+    recheck_btn = ttk.Button(btns, text=T("Tekrar denetle"), command=lambda: refresh_apple())
 
     def refresh_apple():
         if apple_service_installed():
-            apple_lbl.config(text="✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır.")
+            apple_lbl.config(text=T("✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır."))
             drv.set(False)
             drv_chk.pack_forget()
             btns.pack_forget()
         else:
-            apple_lbl.config(text="Bu bilgisayarda Apple'ın iPhone sürücüsü yok. iSync telefona bağlanabilmek için "
-                                  "ücretsiz \"Apple Devices\" uygulamasına ihtiyaç duyar. Aşağıdaki seçenek işaretliyse "
-                                  "kurulum onu da sizin için kurar (Store kullanım koşulları geçerlidir).")
+            apple_lbl.config(text=T("APPLE_MISSING"))
             drv_chk.pack(anchor="w", pady=(6, 0))
             btns.pack(anchor="w", pady=(6, 0))
             store_btn.pack(side="left")
@@ -259,8 +355,8 @@ def gui(args) -> None:
     status.pack(anchor="w")
     actions = ttk.Frame(frm)
     actions.pack(side="bottom", fill="x")
-    go = ttk.Button(actions, text="Kur")
-    cancel = ttk.Button(actions, text="Kapat", command=root.destroy)
+    go = ttk.Button(actions, text=T("Kur"))
+    cancel = ttk.Button(actions, text=T("Kapat"), command=root.destroy)
     cancel.pack(side="right")
     go.pack(side="right", padx=(0, 8))
 
@@ -282,7 +378,7 @@ def gui(args) -> None:
             try:
                 exe = install(target, desk.get(), set_progress)
             except Exception as e:
-                root.after(0, lambda: (messagebox.showerror(APP, f"Kurulum başarısız:\n{e}"),
+                root.after(0, lambda: (messagebox.showerror(APP, T("Kurulum başarısız:\n{}", e)),
                                        go.config(state="normal"), cancel.config(state="normal")))
                 return
             drv_msg = ""
@@ -291,8 +387,7 @@ def gui(args) -> None:
                 set_progress(100, drv_msg)
                 if not ok:
                     root.after(0, lambda: messagebox.showwarning(
-                        APP, drv_msg + "\n\nMicrosoft Store sayfası açılacak; oradan 'Yükle'ye basın. "
-                        "iSync açıldığında bağlantı yardımcısı sizi adım adım yönlendirecek."))
+                        APP, drv_msg + T("DRIVER_FAIL_TAIL")))
                     try:
                         os.startfile(STORE_URL)
                     except Exception:
@@ -300,13 +395,13 @@ def gui(args) -> None:
 
             def done():
                 refresh_apple()
-                status.config(text=f"Kuruldu: {target}" + (f" · {drv_msg}" if drv_msg else ""))
-                cancel.config(state="normal", text="Bitir")
+                status.config(text=T("Kuruldu: {}", target) + (f" · {drv_msg}" if drv_msg else ""))
+                cancel.config(state="normal", text=T("Bitir"))
                 if launch.get():
                     subprocess.Popen([str(exe)], cwd=str(target), close_fds=True)
                     root.after(1200, root.destroy)
                 else:
-                    messagebox.showinfo(APP, "iSync kuruldu. Başlat menüsünden açabilirsiniz.")
+                    messagebox.showinfo(APP, T("iSync kuruldu. Başlat menüsünden açabilirsiniz."))
 
             root.after(0, done)
 

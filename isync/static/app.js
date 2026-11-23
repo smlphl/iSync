@@ -2,7 +2,8 @@
 /* iSync arayüzü — bağımlılıksız, sanal (virtualized) ızgara ile on binlerce fotoğrafı akıcı gösterir. */
 
 const $ = (id) => document.getElementById(id);
-const MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+// Ay adları seçili dile göre (Intl): Türkçe "Kasım", İngilizce "November", Çince "11月"
+const MONTHS = Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(window.LOCALE || "tr-TR", { month: "long" }).format(new Date(2000, i, 1)));
 const GAP = 6, HEAD_H = 46;
 
 const S = {
@@ -42,13 +43,13 @@ function fmtBytes(b) {
 function fmtDur(s) {
   if (s == null || !isFinite(s)) return "–";
   s = Math.round(s);
-  if (s < 60) return `${s} sn`;
+  if (s < 60) return t("{} sn", [s]);
   const m = Math.floor(s / 60), h = Math.floor(m / 60);
-  return h ? `${h} sa ${m % 60} dk` : `${m} dk ${s % 60} sn`;
+  return h ? t("{} sa {} dk", [h, m % 60]) : t("{} dk {} sn", [m, s % 60]);
 }
-const n = (x) => x.toLocaleString("tr-TR");
+const n = (x) => x.toLocaleString(window.LOCALE || "tr-TR");
 function ym(t) { const d = new Date(t * 1000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; }
-function ymLabel(k) { const [y, m] = k.split("-"); return `${MONTHS[+m - 1]} ${y}`; }
+function ymLabel(k) { const [y, m] = k.split("-"); return new Intl.DateTimeFormat(window.LOCALE || "tr-TR", { year: "numeric", month: "long" }).format(new Date(+y, +m - 1, 1)); }
 let toastTimer;
 function toast(msg, err) {
   const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); t.hidden = false;
@@ -343,7 +344,7 @@ function makeTile(g) {
   img.onload = () => img.classList.add("ok");
   img.onerror = () => img.remove();
   img.src = `/api/thumb/${g.id}`;
-  el.title = `${p.name} · ${fmtBytes(g.size)} · ${new Date(p.t * 1000).toLocaleString("tr-TR")}`;
+  el.title = `${p.name} · ${fmtBytes(g.size)} · ${new Date(p.t * 1000).toLocaleString(LOCALE)}`;
   return el;
 }
 
@@ -423,7 +424,7 @@ const photoSource = {
     const p = g.p;
     return {
       name: p.name,
-      meta: `${new Date(p.t * 1000).toLocaleString("tr-TR")} · ${fmtBytes(g.size)} · ${p.dir}`,
+      meta: `${new Date(p.t * 1000).toLocaleString(LOCALE)} · ${fmtBytes(g.size)} · ${p.dir}`,
       img: p.k !== "v" ? `/api/preview/${p.id}` : null,
       video: p.k === "v" ? `/api/preview/${p.id}` : null,
       live: g.liveVideo ? `/api/preview/${g.liveVideo.id}` : null,

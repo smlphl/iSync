@@ -114,14 +114,14 @@ def wait_http(url: str, timeout: float = 20):
     raise SystemExit(f"yanıt yok: {url}")
 
 
-def capture(name: str, port: int, shot: str) -> tuple[bool, int]:
+def capture(name: str, port: int, shot: str, lang: str = "tr") -> tuple[bool, int]:
     req = urllib.request.Request("http://127.0.0.1:9333/json/new?about:blank", method="PUT")
     target = json.loads(urllib.request.urlopen(req).read())
     try:
         ws = WS(target["webSocketDebuggerUrl"])
         ws.s.settimeout(30)
         ws.send("Emulation.setDeviceMetricsOverride", width=W, height=H, deviceScaleFactor=1, mobile=False)
-        ws.send("Page.navigate", url=f"http://127.0.0.1:{port}/?shot={shot}")
+        ws.send("Page.navigate", url=f"http://127.0.0.1:{port}/?shot={shot}&lang={lang}")
         t0, ready = time.time(), False
         while time.time() - t0 < 40:
             r = ws.send("Runtime.evaluate", expression="document.documentElement.getAttribute('data-ready')",
@@ -132,7 +132,9 @@ def capture(name: str, port: int, shot: str) -> tuple[bool, int]:
             time.sleep(0.4)
         time.sleep(0.8)  # son resimler ve geçişler
         img = ws.send("Page.captureScreenshot", format="png")["data"]
-        (OUT / f"{name}.png").write_bytes(base64.b64decode(img))
+        out = OUT if lang == "tr" else OUT / lang
+        out.mkdir(parents=True, exist_ok=True)
+        (out / f"{name}.png").write_bytes(base64.b64decode(img))
         ws.s.close()
         return ready, len(img) * 3 // 4 // 1024
     finally:
@@ -157,11 +159,13 @@ def main():
         wait_http("http://127.0.0.1:8790/api/info")
         wait_http("http://127.0.0.1:8791/api/info")
         wait_http("http://127.0.0.1:9333/json/version")
-        for name, port, shot in SHOTS:
+        langs = [a for a in sys.argv[1:] if a in ("tr", "en", "zh")] or ["tr", "en", "zh"]
+        for lang in langs:
+          for name, port, shot in SHOTS:
             for attempt in range(3):  # başsız tarayıcı ara sıra yanıtsız kalabiliyor: yeniden dene
                 try:
-                    ready, size = capture(name, port, shot)
-                    print(f"{name:10s} {'hazır' if ready else 'ZAMAN AŞIMI'}  {size} KB")
+                    ready, size = capture(name, port, shot, lang)
+                    print(f"{lang} {name:10s} {'hazır' if ready else 'ZAMAN AŞIMI'}  {size} KB")
                     break
                 except Exception as e:
                     print(f"{name:10s} deneme {attempt + 1} başarısız: {type(e).__name__}")

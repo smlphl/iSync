@@ -116,7 +116,8 @@ def selftest() -> int:
 
         static = server.STATIC
         need = ["index.html", "app.js", "views.js", "backup.js", "style.css",
-                "vendor/leaflet/leaflet.js", "vendor/markercluster/leaflet.markercluster.js"]
+                "vendor/leaflet/leaflet.js", "vendor/markercluster/leaflet.markercluster.js",
+                "i18n.js", "i18n/en.json", "i18n/zh.json"]
         missing = [n for n in need if not (static / n).exists()]
         return "ok" if not missing else f"HATA: eksik dosyalar {missing}"
 

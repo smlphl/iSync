@@ -23,6 +23,7 @@ from urllib.parse import quote
 
 from . import APP_NAME, __version__
 from . import devinfo, diag
+from .i18n import tr as i18n_tr
 from .device import DeviceError, DeviceManager
 from .backup import BackupJob, backup_info, default_backup_root
 from .backupdata import Backup, to_vcard
@@ -458,6 +459,8 @@ async def new_count(body: dict[str, Any]):
 async def pick_folder(body: dict[str, Any] | None = None):
     initial = (body or {}).get("initial") or str(Path.home())
 
+    title = i18n_tr("iSync - Hedef klasörü seçin", load_settings().get("lang"))
+
     def _pick() -> Optional[str]:
         try:
             import tkinter as tk
@@ -466,7 +469,7 @@ async def pick_folder(body: dict[str, Any] | None = None):
             root = tk.Tk()
             root.withdraw()
             root.attributes("-topmost", True)
-            path = filedialog.askdirectory(initialdir=initial, title="iSync - Hedef klasörü seçin", mustexist=False)
+            path = filedialog.askdirectory(initialdir=initial, title=title, mustexist=False)
             root.destroy()
             return str(Path(path)) if path else None
         except Exception as e:
@@ -475,13 +478,13 @@ async def pick_folder(body: dict[str, Any] | None = None):
             return None
         # Yedek yol: Windows'un kendi klasör seçme penceresi
         ps = ("Add-Type -AssemblyName System.Windows.Forms;"
-              "$d=New-Object System.Windows.Forms.FolderBrowserDialog;$d.Description='iSync - Klasör seçin';"
+              "$d=New-Object System.Windows.Forms.FolderBrowserDialog;$d.Description=$env:ISYNC_TITLE;"
               "$d.SelectedPath=$env:ISYNC_INITIAL;$d.ShowNewFolderButton=$true;"
               "$f=New-Object System.Windows.Forms.Form;$f.TopMost=$true;"
               "if($d.ShowDialog($f) -eq 'OK'){[Console]::OutputEncoding=[Text.Encoding]::UTF8;$d.SelectedPath}")
         try:
             r = subprocess.run(["powershell", "-NoProfile", "-STA", "-Command", ps], capture_output=True, text=True,
-                               encoding="utf-8", errors="replace", env=dict(os.environ, ISYNC_INITIAL=initial),
+                               encoding="utf-8", errors="replace", env=dict(os.environ, ISYNC_INITIAL=initial, ISYNC_TITLE=title),
                                creationflags=0x08000000, timeout=600)
             return r.stdout.strip() or None
         except Exception as e2:
@@ -508,7 +511,7 @@ async def open_folder(body: dict[str, Any]):
 @app.post("/api/settings")
 async def settings(body: dict[str, Any]):
     s = load_settings()
-    s.update({k: v for k, v in body.items() if k in DEFAULT_SETTINGS or k in ("auto_db", "backup_root")})
+    s.update({k: v for k, v in body.items() if k in DEFAULT_SETTINGS or k in ("auto_db", "backup_root", "lang")})
     save_settings(s)
     return s
 

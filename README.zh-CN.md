@@ -5,20 +5,19 @@
 
 一款**快速**的 iPhone 照片和视频传输工具，还提供地图浏览、设备信息、备份（通讯录、iMessage、WhatsApp）和恢复功能。支持 Windows、macOS 和 Linux。
 界面在浏览器中运行；如果安装了 Edge 或 Chrome，会以不带地址栏的独立应用窗口打开。
+**界面语言：** Türkçe、English、中文 —— 可在右上角切换，默认跟随系统语言。
 
-> 目前应用界面为土耳其语，下面的截图显示的是土耳其语界面。
-
-![iSync 图库与复制](docs/screenshots/gallery.png)
+![iSync 图库与复制](docs/screenshots/zh/gallery.png)
 
 ## 截图
 
 | 地图浏览 | WhatsApp 备份 |
 |---|---|
-| ![地图](docs/screenshots/map.png) | ![WhatsApp](docs/screenshots/whatsapp.png) |
+| ![地图](docs/screenshots/zh/map.png) | ![WhatsApp](docs/screenshots/zh/whatsapp.png) |
 | **设备信息与电池健康** | **应用** |
-| ![设备](docs/screenshots/device.png) | ![应用](docs/screenshots/apps.png) |
+| ![设备](docs/screenshots/zh/device.png) | ![应用](docs/screenshots/zh/apps.png) |
 | **备份与恢复** | **连接助手** |
-| ![备份](docs/screenshots/backup.png) | ![连接助手](docs/screenshots/wizard.png) |
+| ![备份](docs/screenshots/zh/backup.png) | ![连接助手](docs/screenshots/zh/wizard.png) |
 
 > 截图在演示模式下使用**虚构数据**拍摄：图片由程序生成，姓名和消息均为虚构。
 
@@ -45,7 +44,7 @@ Windows 资源管理器通过 **WPD/MTP** 层访问 iPhone。该层会逐个计�
 
 **三步完成：**
 1. 双击 `iSync-Setup-<版本>.exe`。如果 Windows 显示"Windows 已保护你的电脑"，请点击**更多信息 › 仍要运行**。出现此提示是因为应用没有数字签名。
-2. 点击**安装**（Kur）。如果缺少 Apple 的 iPhone 驱动，"同时自动安装 Apple 驱动"选项会默认勾选，驱动也会一并安装。
+2. 点击**安装**。如果缺少 Apple 的 iPhone 驱动，"同时自动安装 Apple 驱动"选项会默认勾选，驱动也会一并安装。
 3. iSync 打开后，**连接助手**会一步步告诉你该做什么，直到手机连接成功：数据线、解锁、"信任"。
 
 详细说明：
@@ -56,6 +55,7 @@ Windows 资源管理器通过 **WPD/MTP** 层访问 iPhone。该层会逐个计�
 - 静默安装：`iSync-Setup-1.0.0.exe --silent [--dir 路径] [--no-desktop] [--no-launch] [--driver]`
 - 如果 iSync 已在运行，再次启动不会打开第二个实例，而是显示已打开的窗口。
 - 关闭窗口后，如果没有正在进行的复制或备份，后台服务器会在几分钟内自动退出。
+- 安装程序、应用和卸载程序都会跟随 Windows 语言（土耳其语、英语或中文）。
 
 ### 连接助手
 当没有连接手机时（首次启动、点击"刷新"或拔出手机时），iSync 会依次自动检查以下步骤：

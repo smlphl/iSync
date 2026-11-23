@@ -11,6 +11,24 @@ UNINSTALL_KEY = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\iSync"
 CREATE_NO_WINDOW = 0x08000000
 
 
+def _lang() -> str:
+    try:
+        import ctypes
+
+        return {0x1F: "tr", 0x04: "zh"}.get(ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0x3FF, "en")
+    except Exception:
+        return "en"
+
+
+_MSG = {
+    "tr": ("iSync'i kaldır", "iSync bu bilgisayardan kaldırılsın mı?\n\n{}\n\nFotoğraflarınız, yedekleriniz ve ayarlarınız (~/.isync) silinmez.",
+           "iSync kaldırıldı."),
+    "en": ("Uninstall iSync", "Remove iSync from this computer?\n\n{}\n\nYour photos, backups and settings (~/.isync) are not deleted.",
+           "iSync has been uninstalled."),
+    "zh": ("卸载 iSync", "要从这台电脑上移除 iSync 吗？\n\n{}\n\n你的照片、备份和设置（~/.isync）不会被删除。", "iSync 已卸载。"),
+}
+
+
 def _folder(name: str) -> Path:
     r = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command",
                         f"[Environment]::GetFolderPath('{name}')"],
@@ -31,10 +49,8 @@ def uninstall(silent: bool = False) -> int:
 
         root = tk.Tk()
         root.withdraw()
-        ok = messagebox.askyesno(
-            "iSync'i kaldır",
-            f"iSync bu bilgisayardan kaldırılsın mı?\n\n{install_dir}\n\n"
-            "Fotoğraflarınız, yedekleriniz ve ayarlarınız (~/.isync) silinmez.")
+        title, question, _ = _MSG[_lang()]
+        ok = messagebox.askyesno(title, question.format(install_dir))
         root.destroy()
         if not ok:
             return 0
@@ -64,7 +80,7 @@ def uninstall(silent: bool = False) -> int:
 
         root = tk.Tk()
         root.withdraw()
-        messagebox.showinfo("iSync", "iSync kaldırıldı.")
+        messagebox.showinfo("iSync", _MSG[_lang()][2])
         root.destroy()
     return 0
 

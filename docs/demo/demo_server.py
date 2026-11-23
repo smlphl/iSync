@@ -293,8 +293,8 @@ def db_status():
 @app.get("/api/device/details")
 def details():
     return {"hardware": {"name": "Demo iPhone", "model": "iPhone 15 Pro Max", "product_type": "iPhone16,2",
-                         "model_number": "XXXX0TU/A", "hardware_model": "D84AP", "color": "Doğal Titanyum", "ios": "26.5",
-                         "build": "23F77", "serial": "DEMO000000", "imei": "35000000000000 (örnek)", "imei2": None,
+                         "model_number": "XXXX0TU/A", "hardware_model": "D84AP", "color": "Siyah / Uzay Grisi", "ios": "26.5",
+                         "build": "23F77", "serial": "DEMO000000", "imei": "350000000000000", "imei2": None,
                          "udid": "00000000-DEMO", "wifi_mac": "00:00:5e:00:53:01", "bt_mac": "00:00:5e:00:53:02",
                          "baseband": "3.10.01", "activation": "Activated", "passcode": True, "timezone": "Europe/Istanbul",
                          "language": "tr-TR", "locale": "tr_TR"},

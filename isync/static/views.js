@@ -171,7 +171,7 @@ const mapSource = {
     const isImg = p[4] === "p";
     return {
       name: parts[parts.length - 1],
-      meta: `${new Date(p[3] * 1000).toLocaleString("tr-TR")} · ${parts.slice(0, -1).join("/") || "/"} · ${p[1].toFixed(4)}, ${p[2].toFixed(4)}`,
+      meta: `${new Date(p[3] * 1000).toLocaleString(LOCALE)} · ${parts.slice(0, -1).join("/") || "/"} · ${p[1].toFixed(4)}, ${p[2].toFixed(4)}`,
       img: isImg ? fileUrl(p[0], { preview: 1 }) : null,
       video: isImg ? null : fileUrl(p[0]),
       download: fileUrl(p[0], { download: 1 }),
@@ -251,14 +251,14 @@ async function loadDevice() {
       <img class="wall" id="wallImg" alt="Duvar kağıdı" hidden>
       <div style="display:flex;gap:8px"><button class="btn small" id="wallBtn">Duvar kağıdını göster</button><a class="btn small" href="/api/wallpaper" download="iphone-duvar-kagidi.png">İndir</a></div>`),
     card("Pil sağlığı", `
-      <div class="big-num">${health != null ? "%" + health : "–"} <small>maksimum kapasite</small></div>
+      <div class="big-num">${health != null ? pct(health) : "–"} <small>maksimum kapasite</small></div>
       <div class="gauge"><div class="${hcls}" style="width:${health || 0}%"></div></div>
       ${kv([
         ["Şarj döngüsü", b.cycles != null ? n(b.cycles) : null],
         ["Tam kapasite", b.full_mah ? `${n(b.full_mah)} mAh` : null],
         ["Tasarım kapasitesi", b.design_mah ? `${n(b.design_mah)} mAh` : null],
-        ["Ham oran", b.health_raw != null ? `%${b.health_raw}` : null],
-        ["Şarj seviyesi", b.level != null ? `%${b.level}${b.charging ? " · şarj oluyor" : ""}` : null],
+        ["Ham oran", b.health_raw != null ? pct(b.health_raw) : null],
+        ["Şarj seviyesi", b.level != null ? `${pct(b.level)}${b.charging ? " · şarj oluyor" : ""}` : null],
         ["Sıcaklık", b.temp_c != null ? `${b.temp_c} °C` : null],
         ["Ortalama / en yüksek", b.avg_temp_c != null ? `${b.avg_temp_c} °C / ${b.max_temp_c ?? "–"} °C` : null],
         ["Voltaj", b.voltage ? `${b.voltage} V` : null],
@@ -282,7 +282,7 @@ async function loadDevice() {
     ]) + `<div class="muted small">Garanti sorgusu ve servis için. Değere tıklayınca kopyalanır.</div>`),
     card("Yedekleme ve eşitleme", kv([
       ["iCloud yedekleme", yesno(bk.icloud)],
-      ["Son iCloud yedeği", bk.last_icloud ? new Date(bk.last_icloud * 1000).toLocaleString("tr-TR") : null],
+      ["Son iCloud yedeği", bk.last_icloud ? new Date(bk.last_icloud * 1000).toLocaleString(LOCALE) : null],
       ["Yerel yedek şifreli", bk.encrypted_local == null ? null : bk.encrypted_local ? "Evet" : "Hayır"],
       ...Object.entries(d.sync_sources || {}).map(([k, v]) => [({ Contacts: "Kişiler", Notes: "Notlar", Bookmarks: "Yer imleri", Calendars: "Takvimler" }[k] || k), v.join(", ") || "Bu cihaz"]),
       ["Wi-Fi ile eşitleme", d.wifi_sync == null ? null : d.wifi_sync ? "Destekleniyor" : "Yok"],
@@ -323,7 +323,7 @@ function renderApps() {
   let list = A.apps.filter((a) => (!qq || a.name.toLowerCase().includes(qq) || a.id.toLowerCase().includes(qq)) && (!$("appsSharing").checked || a.sharing));
   const sort = A.sized ? $("appsSort").value : "name";
   const key = { size: "size", data: "data_size", app: "app_size" }[sort];
-  if (key) list.sort((a, b) => b[key] - a[key]); else list.sort((a, b) => a.name.localeCompare(b.name, "tr"));
+  if (key) list.sort((a, b) => b[key] - a[key]); else list.sort((a, b) => a.name.localeCompare(b.name, LOCALE));
   const total = A.apps.reduce((s, a) => s + a.size, 0);
   $("appsStats").textContent = `${n(A.apps.length)} uygulama · ${A.sized ? "toplam " + fmtBytes(total) : "boyutlar iPhone'da hesaplanıyor (~1 dk)…"} · ${n(A.apps.filter((a) => a.sharing).length)} tanesinin belgelerine erişilebilir`;
   const sz = (v) => (A.sized ? fmtBytes(v) : "…");
@@ -365,7 +365,7 @@ async function openDocs(id, path) {
         ? `<div class="doc" data-dir="${escapeHtml(p)}"><span class="ic">📁</span><span class="nm">${escapeHtml(it.name)}</span></div>`
         : `<a class="doc" href="/api/apps/${encodeURIComponent(id)}/file?${q({ path: p })}" download="${escapeHtml(it.name)}" style="color:inherit;text-decoration:none">
              <span class="ic">📄</span><span class="nm">${escapeHtml(it.name)}</span>
-             <span class="muted">${fmtBytes(it.size)}${it.mtime ? " · " + new Date(it.mtime * 1000).toLocaleDateString("tr-TR") : ""}</span></a>`;
+             <span class="muted">${fmtBytes(it.size)}${it.mtime ? " · " + new Date(it.mtime * 1000).toLocaleDateString(LOCALE) : ""}</span></a>`;
     }).join("");
     $("docsList").innerHTML = h;
   } catch (e) { $("docsList").innerHTML = `<div class="muted" style="padding:10px">${escapeHtml(e.message)}</div>`; }
