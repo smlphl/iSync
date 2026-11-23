@@ -1,9 +1,28 @@
-# iSync
+<p align="center"><img src="packaging/iSync.png" width="96" alt="iSync"></p>
+<h1 align="center">iSync</h1>
+<p align="center"><b>Türkçe</b> · <a href="README.en.md">English</a> · <a href="README.zh-CN.md">简体中文</a></p>
+<p align="center"><i>Sync iPhone photos and etc. Smoothly!</i></p>
 
-*Sync iPhone photos and etc. Smoothly!*
-
-iPhone'daki fotoğraf ve videoları bilgisayara **hızlı** aktaran araç. Windows, macOS ve Linux'ta çalışır.
+iPhone'daki fotoğraf ve videoları bilgisayara **hızlı** aktaran araç. Harita gezgini, cihaz bilgisi, yedekleme (kişiler, iMessage, WhatsApp) ve geri yükleme de içerir. Windows, macOS ve Linux'ta çalışır.
 Arayüz tarayıcıda açılır; Edge/Chrome yüklüyse adres çubuğu olmayan ayrı bir uygulama penceresi olarak gelir.
+
+![iSync galeri ve kopyalama](docs/screenshots/gallery.png)
+
+## Ekran görüntüleri
+
+| Harita gezgini | WhatsApp yedeği |
+|---|---|
+| ![Harita](docs/screenshots/map.png) | ![WhatsApp](docs/screenshots/whatsapp.png) |
+| **Cihaz bilgisi ve pil sağlığı** | **Uygulamalar** |
+| ![Cihaz](docs/screenshots/device.png) | ![Uygulamalar](docs/screenshots/apps.png) |
+| **Yedek ve geri yükleme** | **Bağlantı yardımcısı** |
+| ![Yedek](docs/screenshots/backup.png) | ![Bağlantı yardımcısı](docs/screenshots/wizard.png) |
+
+> Ekran görüntüleri demo modunda, **sahte verilerle** çekildi: resimler programla çizildi, isimler ve mesajlar uydurmadır.
+
+## İndir
+
+[**Releases**](https://github.com/smlphl/iSync/releases) sayfasından `iSync-Setup-<sürüm>.exe` dosyasını indir ve çalıştır. Ayrıntılar için aşağıdaki [Kurulum](#kurulum-önerilen) bölümüne bak.
 
 ## Neden hızlı?
 
@@ -18,8 +37,9 @@ kendi **AFC** protokolüyle (iTools'un da kullandığı yöntem) doğrudan konu�
 | Küçük resim (galeri) | ~30 ms/adet, iPhone'un hazır küçük resimleri kullanılır |
 | Aktarım hızı | ~36 MB/s (USB 2 kablonun üst sınırı) |
 
-> **Hız ipucu:** iPhone 15 Pro Max USB 3 (10 Gbit/s) destekler, ancak kutudan çıkan kablo USB 2'dir
-> (~36 MB/s). USB 3 destekli bir USB-C kablo ile bilgisayarın USB 3 portunu kullanırsanız aktarım çok daha hızlı olur.
+> **Hız notu:** iPhone 15 Pro ve sonrası USB 3 (10 Gbit/s) destekler, ancak kutudan çıkan kablo USB 2'dir (~36 MB/s).
+> USB 3 kablo hızı artırabilir, fakat iPhone'un USB 3'e geçişi tutarsızdır: bazı bağlantılarda, Mac'te bile, USB 2'de kalır.
+> Thunderbolt 3 aktif kablolar düz USB cihazlarında yalnızca USB 2.0 çalışır.
 
 ## Kurulum (önerilen)
 
@@ -67,6 +87,11 @@ powershell -ExecutionPolicy Bypass -File packaging\build.ps1
 - iPhone'un kilidi açık olmalı ve "Bu Bilgisayara Güven" onaylanmış olmalı
 
 Komut satırı seçenekleri: `python -m isync --port 8765 --no-browser --host 0.0.0.0 --auto-exit`
+
+README ekran görüntülerini yenilemek için (sahte verilerle çalışan demo sunucusu, Edge veya Chrome gerekir):
+```powershell
+.venv\Scripts\python docs\demo\take_screenshots.py
+```
 
 ## Özellikler
 
