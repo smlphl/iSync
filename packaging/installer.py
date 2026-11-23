@@ -4,7 +4,8 @@
 - Başlat menüsü + (isteğe bağlı) masaüstü kısayolu, Programlar ve Özellikler'de kaldırma kaydı
 - iPhone bağlantısı için gereken Apple Mobile Device Service yoksa kullanıcıyı
   Microsoft Store'daki "Apple Devices" uygulamasına yönlendirir (Apple'ın sürücüsünü biz dağıtmayız)
-- Sessiz kurulum: iSync-Setup.exe --silent [--dir YOL] [--no-desktop] [--no-launch]
+- Sessiz kurulum: iSync-Setup.exe --silent [--dir YOL] [--no-desktop] [--no-launch] [--driver] [--lang tr|en|zh]
+- Dil: Windows diline göre başlar, sağ üstten değiştirilebilir; seçilen dil uygulamaya da aktarılır
 """
 
 from __future__ import annotations
@@ -117,6 +118,24 @@ _TR = {
     "DRIVER_FAIL_TAIL": "\n\nMicrosoft Store sayfası açılacak; oradan 'Yükle'ye basın. "
                         "iSync açıldığında bağlantı yardımcısı sizi adım adım yönlendirecek.",
 }
+
+
+LANG_NAMES = {"tr": "Türkçe", "en": "English", "zh": "中文"}
+
+
+def save_lang(lang: str) -> None:
+    """Kurulumda seçilen dili uygulamaya aktar (~/.isync/settings.json içindeki 'lang')."""
+    import json
+
+    home = Path.home() / ".isync"
+    f = home / "settings.json"
+    try:
+        s = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    except Exception:
+        s = {}
+    s["lang"] = lang
+    home.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(s, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def T(text: str, *args) -> str:
@@ -264,6 +283,10 @@ def install(install_dir: Path, desktop: bool, progress=lambda pct, msg: None) ->
         shortcut(special_folder("Desktop") / f"{APP}.lnk", exe, install_dir, T("iPhone fotoğraf ve yedek aracı"))
     progress(95, T("Kaldırma kaydı yazılıyor…"))
     register_uninstall(install_dir, version)
+    try:
+        save_lang(LANG)
+    except Exception:
+        pass
     progress(100, T("Kurulum tamamlandı."))
     return exe
 
@@ -275,8 +298,7 @@ def gui(args) -> None:
 
     version = payload_version()
     root = tk.Tk()
-    root.title(T("{} {} Kurulumu", APP, version))
-    root.geometry("640x560")
+    root.geometry("640x580")
     root.resizable(False, False)
     try:
         root.iconbitmap(str(resource("iSync.ico")))
@@ -288,126 +310,160 @@ def gui(args) -> None:
     except Exception:
         pass
 
-    frm = ttk.Frame(root, padding=20)
-    frm.pack(fill="both", expand=True)
-    head = ttk.Frame(frm)
-    head.pack(fill="x")
-    try:
-        img = tk.PhotoImage(file=str(resource("iSync.png"))).subsample(4, 4)
-        lbl = ttk.Label(head, image=img)
-        lbl.image = img
-        lbl.pack(side="left", padx=(0, 14))
-    except Exception:
-        pass
-    t = ttk.Frame(head)
-    t.pack(side="left", fill="x")
-    ttk.Label(t, text=f"{APP} {version}", font=("Segoe UI", 18, "bold")).pack(anchor="w")
-    ttk.Label(t, text=T("iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme")).pack(anchor="w")
-
-    ttk.Label(frm, text=T("Kurulum klasörü:")).pack(anchor="w", pady=(18, 2))
-    row = ttk.Frame(frm)
-    row.pack(fill="x")
+    # Dil değişince arayüz yeniden çizilir; kullanıcının seçimleri bu değişkenlerde korunur
     dir_var = tk.StringVar(value=str(Path(args.dir) if args.dir else default_dir()))
-    ttk.Entry(row, textvariable=dir_var).pack(side="left", fill="x", expand=True)
-
-    def browse():
-        p = filedialog.askdirectory(initialdir=dir_var.get())
-        if p:
-            dir_var.set(str(Path(p) / APP) if Path(p).name.lower() != APP.lower() else p)
-
-    ttk.Button(row, text=T("Gözat…"), command=browse).pack(side="left", padx=(6, 0))
-
     desk = tk.BooleanVar(value=not args.no_desktop)
     launch = tk.BooleanVar(value=not args.no_launch)
-    ttk.Checkbutton(frm, text=T("Masaüstüne kısayol koy"), variable=desk).pack(anchor="w", pady=(12, 0))
-    ttk.Checkbutton(frm, text=T("Kurulumdan sonra iSync'i başlat"), variable=launch).pack(anchor="w")
-
-    # Apple sürücüsü
-    box = ttk.LabelFrame(frm, text=T("iPhone bağlantı sürücüsü"), padding=10)
-    box.pack(fill="x", pady=(14, 0))
-    apple_lbl = ttk.Label(box, text="", wraplength=540, justify="left")
-    apple_lbl.pack(anchor="w")
     drv = tk.BooleanVar(value=True)
-    drv_chk = ttk.Checkbutton(box, text=T("Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)"),
-                              variable=drv)
-    btns = ttk.Frame(box)
-    store_btn = ttk.Button(btns, text=T("Microsoft Store'da aç"), command=lambda: os.startfile(STORE_URL))
-    recheck_btn = ttk.Button(btns, text=T("Tekrar denetle"), command=lambda: refresh_apple())
+    lang_var = tk.StringVar(value=LANG_NAMES.get(LANG, "English"))
+    state = {"frm": None}
 
-    def refresh_apple():
-        if apple_service_installed():
-            apple_lbl.config(text=T("✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır."))
-            drv.set(False)
-            drv_chk.pack_forget()
-            btns.pack_forget()
-        else:
-            apple_lbl.config(text=T("APPLE_MISSING"))
-            drv_chk.pack(anchor="w", pady=(6, 0))
-            btns.pack(anchor="w", pady=(6, 0))
-            store_btn.pack(side="left")
-            recheck_btn.pack(side="left", padx=(6, 0))
+    def build():
+        global LANG
+        if state["frm"] is not None:
+            state["frm"].destroy()
+        root.title(T("{} {} Kurulumu", APP, version))
+        frm = ttk.Frame(root, padding=20)
+        frm.pack(fill="both", expand=True)
+        state["frm"] = frm
 
-    refresh_apple()
+        head = ttk.Frame(frm)
+        head.pack(fill="x")
+        try:
+            img = tk.PhotoImage(file=str(resource("iSync.png"))).subsample(4, 4)
+            lbl = ttk.Label(head, image=img)
+            lbl.image = img
+            lbl.pack(side="left", padx=(0, 14))
+        except Exception:
+            pass
+        t = ttk.Frame(head)
+        t.pack(side="left", fill="x")
+        ttk.Label(t, text=f"{APP} {version}", font=("Segoe UI", 18, "bold")).pack(anchor="w")
+        ttk.Label(t, text=T("iPhone fotoğraf aktarımı, harita, yedek ve geri yükleme")).pack(anchor="w")
 
-    bar = ttk.Progressbar(frm, maximum=100)
-    bar.pack(fill="x", pady=(16, 4))
-    status = ttk.Label(frm, text="", foreground="#555")
-    status.pack(anchor="w")
-    actions = ttk.Frame(frm)
-    actions.pack(side="bottom", fill="x")
-    go = ttk.Button(actions, text=T("Kur"))
-    cancel = ttk.Button(actions, text=T("Kapat"), command=root.destroy)
-    cancel.pack(side="right")
-    go.pack(side="right", padx=(0, 8))
+        # Dil seçici (sağ üst)
+        lang_box = ttk.Frame(head)
+        lang_box.pack(side="right", anchor="n")
+        ttk.Label(lang_box, text="🌐").pack(side="left", padx=(0, 4))
+        lang_cb = ttk.Combobox(lang_box, textvariable=lang_var, values=list(LANG_NAMES.values()),
+                               state="readonly", width=9)
+        lang_cb.pack(side="left")
 
-    def set_progress(pct, msg):
-        def apply():
-            if pct is None:  # süresi belirsiz adım (sürücü indirme)
-                bar.config(mode="indeterminate"); bar.start(12)
+        def on_lang(_e=None):
+            global LANG
+            code = next((k for k, v in LANG_NAMES.items() if v == lang_var.get()), "en")
+            if code != LANG:
+                LANG = code
+                root.after(0, build)
+
+        lang_cb.bind("<<ComboboxSelected>>", on_lang)
+
+        ttk.Label(frm, text=T("Kurulum klasörü:")).pack(anchor="w", pady=(18, 2))
+        row = ttk.Frame(frm)
+        row.pack(fill="x")
+        ttk.Entry(row, textvariable=dir_var).pack(side="left", fill="x", expand=True)
+
+        def browse():
+            p = filedialog.askdirectory(initialdir=dir_var.get())
+            if p:
+                dir_var.set(str(Path(p) / APP) if Path(p).name.lower() != APP.lower() else p)
+
+        ttk.Button(row, text=T("Gözat…"), command=browse).pack(side="left", padx=(6, 0))
+
+        ttk.Checkbutton(frm, text=T("Masaüstüne kısayol koy"), variable=desk).pack(anchor="w", pady=(12, 0))
+        ttk.Checkbutton(frm, text=T("Kurulumdan sonra iSync'i başlat"), variable=launch).pack(anchor="w")
+
+        # Apple sürücüsü
+        box = ttk.LabelFrame(frm, text=T("iPhone bağlantı sürücüsü"), padding=10)
+        box.pack(fill="x", pady=(14, 0))
+        apple_lbl = ttk.Label(box, text="", wraplength=560, justify="left")
+        apple_lbl.pack(anchor="w")
+        drv_chk = ttk.Checkbutton(box, text=T("Apple sürücüsünü de otomatik kur (önerilir · Microsoft Store, ücretsiz)"),
+                                  variable=drv)
+        btns = ttk.Frame(box)
+        store_btn = ttk.Button(btns, text=T("Microsoft Store'da aç"), command=lambda: os.startfile(STORE_URL))
+        recheck_btn = ttk.Button(btns, text=T("Tekrar denetle"), command=lambda: refresh_apple())
+
+        def refresh_apple():
+            if apple_service_installed():
+                apple_lbl.config(text=T("✓ Apple Mobile Device Service bulundu. iPhone bağlantısı hazır."))
+                drv.set(False)
+                drv_chk.pack_forget()
+                btns.pack_forget()
             else:
-                bar.stop(); bar.config(mode="determinate", value=pct)
-            status.config(text=msg)
-        root.after(0, apply)
+                apple_lbl.config(text=T("APPLE_MISSING"))
+                drv_chk.pack(anchor="w", pady=(6, 0))
+                btns.pack(anchor="w", pady=(6, 0))
+                store_btn.pack(side="left")
+                recheck_btn.pack(side="left", padx=(6, 0))
 
-    def run():
-        go.config(state="disabled")
-        cancel.config(state="disabled")
-        target = Path(dir_var.get())
+        refresh_apple()
 
-        def work():
-            try:
-                exe = install(target, desk.get(), set_progress)
-            except Exception as e:
-                root.after(0, lambda: (messagebox.showerror(APP, T("Kurulum başarısız:\n{}", e)),
-                                       go.config(state="normal"), cancel.config(state="normal")))
-                return
-            drv_msg = ""
-            if drv.get() and not apple_service_installed():
-                ok, drv_msg = install_apple_driver(set_progress)
-                set_progress(100, drv_msg)
-                if not ok:
-                    root.after(0, lambda: messagebox.showwarning(
-                        APP, drv_msg + T("DRIVER_FAIL_TAIL")))
-                    try:
-                        os.startfile(STORE_URL)
-                    except Exception:
-                        pass
+        bar = ttk.Progressbar(frm, maximum=100)
+        bar.pack(fill="x", pady=(16, 4))
+        status = ttk.Label(frm, text="", foreground="#555")
+        status.pack(anchor="w")
+        actions = ttk.Frame(frm)
+        actions.pack(side="bottom", fill="x")
+        go = ttk.Button(actions, text=T("Kur"))
+        cancel = ttk.Button(actions, text=T("Kapat"), command=root.destroy)
+        cancel.pack(side="right")
+        go.pack(side="right", padx=(0, 8))
 
-            def done():
-                refresh_apple()
-                status.config(text=T("Kuruldu: {}", target) + (f" · {drv_msg}" if drv_msg else ""))
-                cancel.config(state="normal", text=T("Bitir"))
-                if launch.get():
-                    subprocess.Popen([str(exe)], cwd=str(target), close_fds=True)
-                    root.after(1200, root.destroy)
+        def set_progress(pct, msg):
+            def apply():
+                if pct is None:  # süresi belirsiz adım (sürücü indirme)
+                    bar.config(mode="indeterminate"); bar.start(12)
                 else:
-                    messagebox.showinfo(APP, T("iSync kuruldu. Başlat menüsünden açabilirsiniz."))
+                    bar.stop(); bar.config(mode="determinate", value=pct)
+                status.config(text=msg)
+            root.after(0, apply)
 
-            root.after(0, done)
+        def run():
+            go.config(state="disabled")
+            cancel.config(state="disabled")
+            lang_cb.config(state="disabled")  # kurulum sürerken dil değişmez
+            target = Path(dir_var.get())
 
-        threading.Thread(target=work, daemon=True).start()
+            def work():
+                try:
+                    exe = install(target, desk.get(), set_progress)
+                except Exception as e:
+                    def fail(e=e):
+                        messagebox.showerror(APP, T("Kurulum başarısız:\n{}", e))
+                        go.config(state="normal")
+                        cancel.config(state="normal")
+                        lang_cb.config(state="readonly")
+                    root.after(0, fail)
+                    return
+                drv_msg = ""
+                if drv.get() and not apple_service_installed():
+                    ok, drv_msg = install_apple_driver(set_progress)
+                    set_progress(100, drv_msg)
+                    if not ok:
+                        root.after(0, lambda: messagebox.showwarning(APP, drv_msg + T("DRIVER_FAIL_TAIL")))
+                        try:
+                            os.startfile(STORE_URL)
+                        except Exception:
+                            pass
 
-    go.config(command=run)
+                def done():
+                    refresh_apple()
+                    status.config(text=T("Kuruldu: {}", target) + (f" · {drv_msg}" if drv_msg else ""))
+                    cancel.config(state="normal", text=T("Bitir"))
+                    if launch.get():
+                        subprocess.Popen([str(exe)], cwd=str(target), close_fds=True)
+                        root.after(1200, root.destroy)
+                    else:
+                        messagebox.showinfo(APP, T("iSync kuruldu. Başlat menüsünden açabilirsiniz."))
+
+                root.after(0, done)
+
+            threading.Thread(target=work, daemon=True).start()
+
+        go.config(command=run)
+
+    build()
     root.mainloop()
 
 
@@ -418,7 +474,11 @@ def main() -> None:
     ap.add_argument("--no-desktop", action="store_true")
     ap.add_argument("--no-launch", action="store_true")
     ap.add_argument("--driver", action="store_true", help="Apple sürücüsü yoksa winget ile kur")
+    ap.add_argument("--lang", choices=list(LANG_NAMES), help="Kurulum ve uygulama dili (tr/en/zh)")
     args = ap.parse_args()
+    if args.lang:
+        global LANG
+        LANG = args.lang
     if args.silent:
         target = Path(args.dir) if args.dir else default_dir()
         exe = install(target, not args.no_desktop, lambda p, m: print(f"{p:5.1f}% {m}"))

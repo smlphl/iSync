@@ -54,10 +54,10 @@ Ayrıntılar:
 - Yönetici izni istemez; `%LOCALAPPDATA%\Programs\iSync` klasörüne kurulur. Başlat menüsüne ve isteğe bağlı olarak masaüstüne kısayol koyar.
 - **Ayarlar › Uygulamalar** listesinden kaldırılabilir. Kaldırma fotoğraflara, yedeklere ve ayarlara (`~/.isync`) dokunmaz.
 - **Apple sürücüsü:** Ücretsiz "Apple Devices" uygulaması, Windows'un paket yöneticisi `winget` ile resmi Microsoft Store'dan kurulur; Store'un kullanım koşulları geçerlidir. `winget` yoksa ya da kurulum başarısız olursa Store sayfası açılır. Apple'ın sürücüsü lisans gereği pakete konmadı.
-- Sessiz kurulum: `iSync-Setup-1.0.0.exe --silent [--dir YOL] [--no-desktop] [--no-launch] [--driver]`
+- Sessiz kurulum: `iSync-Setup-1.0.0.exe --silent [--dir YOL] [--no-desktop] [--no-launch] [--driver] [--lang tr|en|zh]`
 - iSync zaten açıksa tekrar çalıştırmak ikinci bir kopya başlatmaz, açık olan pencereyi gösterir.
 - Pencere kapatıldığında, süren bir kopyalama veya yedek yoksa arka plandaki sunucu birkaç dakika içinde kendiliğinden kapanır.
-- Kurulum programı, uygulama ve kaldırma penceresi Windows diline göre Türkçe, İngilizce ya da Çince açılır.
+- Kurulum programı Windows diline göre Türkçe, İngilizce ya da Çince açılır; sağ üstteki seçiciden dil değiştirilebilir. Seçilen dil uygulamaya ve kaldırma penceresine de geçer.
 
 ### Bağlantı yardımcısı
 Telefon bağlı değilse (ilk açılışta, "Yenile"de ya da telefon çıkarılınca) iSync şu adımları sırayla otomatik denetler:

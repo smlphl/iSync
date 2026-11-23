@@ -52,10 +52,10 @@ Windows 资源管理器通过 **WPD/MTP** 层访问 iPhone。该层会逐个计�
 - 无需管理员权限；安装到 `%LOCALAPPDATA%\Programs\iSync`，并添加开始菜单快捷方式（可选桌面快捷方式）。
 - 可在**设置 › 应用**中卸载。卸载不会影响你的照片、备份和设置（`~/.isync`）。
 - **Apple 驱动：** 通过 Windows 包管理器 `winget` 从官方 Microsoft Store 安装免费的"Apple Devices"应用，适用 Store 的使用条款。如果没有 `winget` 或安装失败，会打开 Store 页面。由于许可证限制，Apple 驱动未打包在安装程序中。
-- 静默安装：`iSync-Setup-1.0.0.exe --silent [--dir 路径] [--no-desktop] [--no-launch] [--driver]`
+- 静默安装：`iSync-Setup-1.0.0.exe --silent [--dir 路径] [--no-desktop] [--no-launch] [--driver] [--lang tr|en|zh]`
 - 如果 iSync 已在运行，再次启动不会打开第二个实例，而是显示已打开的窗口。
 - 关闭窗口后，如果没有正在进行的复制或备份，后台服务器会在几分钟内自动退出。
-- 安装程序、应用和卸载程序都会跟随 Windows 语言（土耳其语、英语或中文）。
+- 安装程序默认使用 Windows 语言（土耳其语、英语或中文），右上角可切换语言。所选语言会同步到应用和卸载程序。
 
 ### 连接助手
 当没有连接手机时（首次启动、点击"刷新"或拔出手机时），iSync 会依次自动检查以下步骤：

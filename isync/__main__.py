@@ -58,6 +58,21 @@ def open_ui(url: str) -> None:
     webbrowser.open(url)
 
 
+def ui_url(port: int) -> str:
+    """Kurulumda/arayüzde seçilen dil (~/.isync/settings.json) varsa adrese ekle."""
+    import json
+
+    url = f"http://127.0.0.1:{port}/"
+    try:
+        lang = json.loads(open(os.path.join(os.path.expanduser("~"), ".isync", "settings.json"),
+                               encoding="utf-8").read()).get("lang")
+        if lang in ("tr", "en", "zh"):
+            url += f"?lang={lang}"
+    except Exception:
+        pass
+    return url
+
+
 def running_instance(port: int) -> bool:
     """Bu portta zaten çalışan bir iSync var mı?"""
     import json
@@ -182,7 +197,7 @@ def main() -> None:
 
     # Tek örnek: iSync zaten çalışıyorsa yenisini açma, mevcut pencereyi göster
     if args.host == "127.0.0.1" and running_instance(args.port):
-        url = f"http://127.0.0.1:{args.port}/"
+        url = ui_url(args.port)
         print(f"{APP_NAME} zaten çalışıyor → {url}")
         if not args.no_browser:
             open_ui(url)
@@ -191,7 +206,7 @@ def main() -> None:
     import uvicorn
 
     port = free_port(args.port) if args.host == "127.0.0.1" else args.port
-    url = f"http://127.0.0.1:{port}/"
+    url = ui_url(port)
     print(f"\n  {APP_NAME} {__version__} çalışıyor →  {url}\n  Kapatmak için bu pencereyi kapatın veya Ctrl+C.\n")
 
     if args.auto_exit:

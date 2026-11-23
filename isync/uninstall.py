@@ -12,6 +12,14 @@ CREATE_NO_WINDOW = 0x08000000
 
 
 def _lang() -> str:
+    try:  # önce kurulumda/arayüzde seçilen dil
+        import json
+
+        lang = json.loads((Path.home() / ".isync" / "settings.json").read_text(encoding="utf-8")).get("lang")
+        if lang in ("tr", "en", "zh"):
+            return lang
+    except Exception:
+        pass
     try:
         import ctypes
 

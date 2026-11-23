@@ -137,7 +137,11 @@
     sel.onchange = () => {
       localStorage.setItem("isync.lang", sel.value);
       fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang: sel.value }) })
-        .finally(() => location.reload());
+        .finally(() => { // adresteki eski ?lang= yeni seçimi ezmesin
+          const u = new URL(location.href);
+          u.searchParams.delete("lang");
+          location.replace(u.toString());
+        });
     };
     host.prepend(sel);
   }

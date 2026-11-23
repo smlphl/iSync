@@ -52,10 +52,10 @@ Details:
 - No admin rights needed; it installs to `%LOCALAPPDATA%\Programs\iSync` and adds a Start menu shortcut (and an optional desktop shortcut).
 - Uninstall from **Settings › Apps**. Uninstalling doesn't touch your photos, backups or settings (`~/.isync`).
 - **Apple driver:** The free "Apple Devices" app is installed from the official Microsoft Store via Windows' `winget` package manager; the Store's terms apply. If `winget` is missing or the install fails, the Store page opens. Apple's driver is not bundled because its license doesn't allow it.
-- Silent install: `iSync-Setup-1.0.0.exe --silent [--dir PATH] [--no-desktop] [--no-launch] [--driver]`
+- Silent install: `iSync-Setup-1.0.0.exe --silent [--dir PATH] [--no-desktop] [--no-launch] [--driver] [--lang tr|en|zh]`
 - If iSync is already running, launching it again doesn't start a second copy; it shows the open window.
 - When the window is closed and no copy or backup is running, the background server shuts itself down within a few minutes.
-- The installer, the app and the uninstaller follow your Windows language (Turkish, English or Chinese).
+- The installer starts in your Windows language (Turkish, English or Chinese) and has a language picker at the top right. The language you pick is carried over to the app and the uninstaller.
 
 ### Connection assistant
 When no phone is connected (on first launch, on "Refresh", or when the phone is unplugged), iSync checks these steps in order:
